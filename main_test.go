@@ -165,7 +165,7 @@ func TestCreateBuildHandler(t *testing.T) {
 			if tt.expectedStatus == http.StatusCreated || tt.dbError != nil {
 				mockDB.On("CreateBuild", mock.AnythingOfType("*main.BuildRequest")).
 					Return(tt.expectedID, tt.dbError).Once()
-				
+
 				// Mock the UpdateBuildStatus calls for the background processing
 				if tt.dbError == nil && tt.expectedStatus == http.StatusCreated {
 					mockDB.On("UpdateBuildStatus", tt.expectedID, "running").Return(nil).Maybe()
@@ -189,7 +189,7 @@ func TestCreateBuildHandler(t *testing.T) {
 				assert.Equal(t, tt.expectedID, build.ID)
 				assert.Equal(t, tt.requestBody["project_name"], build.ProjectName)
 				assert.Equal(t, "queued", build.Status)
-				
+
 				// Wait a moment for the goroutine to start
 				time.Sleep(10 * time.Millisecond)
 			}
@@ -340,7 +340,7 @@ func TestListBuildsHandler(t *testing.T) {
 				err := json.Unmarshal(rr.Body.Bytes(), &builds)
 				assert.NoError(t, err)
 				assert.Len(t, builds, tt.expectedCount)
-				
+
 				if tt.expectedCount > 0 {
 					assert.Equal(t, testBuilds[0].ProjectName, builds[0].ProjectName)
 				}
@@ -380,6 +380,9 @@ func BenchmarkCreateBuild(b *testing.B) {
 	// Setup mock to return success for all calls
 	mockDB.On("CreateBuild", mock.AnythingOfType("*main.BuildRequest")).
 		Return(1, nil)
+	// Mock the background processing calls
+	mockDB.On("UpdateBuildStatus", mock.AnythingOfType("int"), mock.AnythingOfType("string")).
+		Return(nil).Maybe()
 
 	requestBody := map[string]interface{}{
 		"project_name": "benchmark-project",

@@ -35,10 +35,10 @@ type BuildRequest struct {
 
 // Metrics holds prometheus metrics
 type Metrics struct {
-	BuildsTotal     prometheus.CounterVec
-	BuildDuration   prometheus.HistogramVec
-	ActiveBuilds    prometheus.Gauge
-	HealthCheck     prometheus.Gauge
+	BuildsTotal   prometheus.CounterVec
+	BuildDuration prometheus.HistogramVec
+	ActiveBuilds  prometheus.Gauge
+	HealthCheck   prometheus.Gauge
 }
 
 // NewMetrics creates new metrics instance
@@ -85,7 +85,7 @@ func NewBuildService(db DatabaseInterface) *BuildService {
 	metrics := NewMetrics()
 	metrics.Register(prometheus.DefaultRegisterer)
 	metrics.HealthCheck.Set(1) // Set initial health status to healthy
-	
+
 	return &BuildService{
 		db:      db,
 		metrics: metrics,
@@ -97,7 +97,7 @@ func NewBuildServiceWithRegistry(db DatabaseInterface, registry prometheus.Regis
 	metrics := NewMetrics()
 	metrics.Register(registry)
 	metrics.HealthCheck.Set(1) // Set initial health status to healthy
-	
+
 	return &BuildService{
 		db:      db,
 		metrics: metrics,
@@ -270,7 +270,7 @@ func main() {
 
 	// Setup router
 	router := mux.NewRouter()
-	
+
 	// API routes
 	api := router.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc("/health", service.healthHandler).Methods("GET")
